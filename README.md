@@ -1,5 +1,12 @@
-# telegram-dl
-Telegram Media Downloader
+# Telegram Media Downloader (telegram-dl)
+### Download media from Telegram
+
+
+## installation
+`./install.sh`
+
+## uninstallation
+`./uninstall.sh`
 
 ## usage
 `telegram-dl https://t.me/chat_id/874 ~/` 
