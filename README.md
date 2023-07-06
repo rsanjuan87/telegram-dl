@@ -3,10 +3,14 @@
 
 
 ## installation
-`./install.sh`
+
+### manual process
+`git clone https://github.com/rsanjuan87/telegram-dl && cd telegram-dl && ./install.sh`
 
 ## uninstallation
-`./uninstall.sh`
+
+### manual process
+`git clone https://github.com/rsanjuan87/telegram-dl && cd telegram-dl && ./uninstall.sh && cd .. && rm -rf telegram-dl`
 
 ## usage
 `telegram-dl https://t.me/chat_id/874 ~/` 
