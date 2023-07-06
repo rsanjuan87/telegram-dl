@@ -16,39 +16,87 @@ config_dir = '{}/.config/{}/'.format(Path.home(), app_name)
 if not os.path.exists(config_dir):
     os.mkdir(config_dir)
 
-if len(sys.argv) > 1:
-    url = sys.argv[1]
-else:
-    print("Please provide a URL")
-    sys.exit(1)
+url = ''
 output_dir = '.'
-if len(sys.argv) > 2:
-    output_dir = sys.argv[2]
-
 phone_number = ''
-files = [f for f in os.listdir(config_dir) if f.endswith('.session')]
 
 def progress_callback(downloaded_bytes, total_bytes):
-    # print(f"Descargado {downloaded_bytes} de {total_bytes} bytes: {downloaded_bytes / total_bytes:.2%}")
-    bar.update(downloaded_bytes - bar.n)
+    if '--progress-log'in options or '-l'in options:
+        print(f"Descargado {downloaded_bytes} de {total_bytes} bytes: {downloaded_bytes / total_bytes:.2%}")
+    elif not '--quiet'in options and not '-q'in options:
+        bar.update(downloaded_bytes - bar.n)
 
+def show_help():
+    print("Usage: {} <url> [output dir] [options]".format(app_name))
+    print("\nOptions:")
+    print(' session options')
+    print("  -n, --phone-number=<phone number>\tSession phone number to use")
+    # print("  -p, --password=<password>\t\tSession password")
+    # print("  -2, --2factor=<password>\t\t2nd factor password")
+    print('\n collision options')
+    print("  -o, --on-collision-overwrite\t\tOverwrite existing files")
+    print("  -r, --on-collision-rename\t\tRename existing files")
+    print("  -c, --on-collision-cancel\t\tCancel existing files")
+    print('\n progress options')
+    print("  -l, --progress-log\t\t\tShow progress as log")
+    print("  -b, --progress-bar\t\t\tShow progress as bar")
+    print('\n basic options')
+    print("  -q, --quiet\t\t\t\tQuiet mode")
+    print("  -h, --help\t\t\t\tShow this help")
 
-if len(files) == 0:
-    print("No sessions found, please login")
-    phone_number = input("Phone Number: ")
-elif len(files) == 1:
-    phone_number = files[0].removesuffix('.session')
-else:
-    print("Multiple sessions found, select session")
-    i = 0
-    for file in files:
-            print('[{}] '.format(i+1) +file.removesuffix('.session'))
-            i+=1
-    print('[q] to quit')
-    i = input("Select session: ")
-    if i == 'q':
+options =[]
+for e in sys.argv:
+    if e == 'main.py' or e == app_name:
+        continue
+    if e == '--help' or e == '-h':
+        show_help()
         sys.exit(0)
-    phone_number = files[int(i)-1].removesuffix('.session')
+    if e.startswith('--'):
+        options.append(e)
+    elif e.startswith('-'):
+        options.append(e)
+    else:
+        if url == '' and e.startswith('http'):
+            url = e
+        else:
+            output_dir = e
+
+for e in options:
+    if e.startswith('--number='):
+        phone_number = e.replace('--number=', '')
+    elif e.startswith('-n='):
+        phone_number = e.replace('-n=', '')
+
+
+print(options)
+
+
+if url == '':
+    print("Please provide a URL")
+    sys.exit(1)
+
+if phone_number == '':
+    files = [f for f in os.listdir(config_dir) if f.endswith('.session')]
+    if len(files) == 0:
+        print("No sessions found, please login")
+        phone_number = input("Phone Number: ")
+    elif len(files) == 1:
+        phone_number = files[0].removesuffix('.session')
+    else:
+        print("Multiple sessions found, select session")
+        i = 0
+        for file in files:
+                print('[{}] '.format(i+1) +file.removesuffix('.session'))
+                i+=1
+        print('[q] to quit')
+        i = input("Select session: ")
+        if i == 'q':
+            sys.exit(0)
+        phone_number = files[int(i)-1].removesuffix('.session')
+
+print(phone_number)
+print(url)
+exit
     
 channel = url.split('/')[3]
 message_id = int(url.split('/')[4])
@@ -89,9 +137,47 @@ if message.media:
         for attribute in message.media.document.attributes:
             if isinstance(attribute, DocumentAttributeFilename):
                 filename = attribute.file_name
-    print('Filename:', filename, ', Output directory:', output_dir)
+
+    output_file = os.path.join(output_dir, filename)
+    c = 1
+    o = ''
+    if '--on-collision-overwrite' in options or '-o' in options:
+        o = 'o'
+    elif '--on-collision-rename' in options or '-r' in options:
+        o = 'r'
+    elif '--on-collision-cancel' in options or '-c' in options:
+        o = 'c'
+
+    if o == '' and os.path.exists(output_file):
+        print('Output file already exists', output_file)
+        print('[o] to overwrite')
+        print('[r] to rename')
+        print('[c] to cancel')
+        o = input('Select action: ')
+        if o == 'c':
+            print('Cancelled')
+            sys.exit(0)
+        elif o == 'r':
+            i = output_file.rfind('.')
+            noutput_file = '{}_{}{}'.format(output_file[:i], c,output_file[i:])
+            while os.path.exists(noutput_file):
+                c+=1
+                noutput_file = '{}_{}{}'.format(output_file[:i], c,output_file[i:])
+            output_file = noutput_file
+    
+    print('Filename:', output_file)
     print('Downloading...')
-    with tqdm(total=message.media.document.size, unit='B', unit_scale=True, ncols=100, bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt}') as bar:
-        client.download_media(message.media, '{}/{}'.format(output_dir, filename), progress_callback = progress_callback)
+
+
+    if '--progress-log'in options or '-l'in options:
+        client.download_media(message.media, output_file, progress_callback = progress_callback)
+    elif not '--quiet'in options and not '-q'in options:
+        with tqdm(total=message.media.document.size, unit='B', unit_scale=True, ncols=100, bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt}') as bar:
+            client.download_media(message.media, output_file, progress_callback = progress_callback)
+
+    
 
 sys.exit(0)
+
+
+
