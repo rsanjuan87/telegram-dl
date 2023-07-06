@@ -1,14 +1,26 @@
 #!/usr/bin/env python3
 
-from telethon.sync import TelegramClient
-from telethon.tl.functions.contacts import ResolveUsernameRequest
-from telethon.tl.functions.channels import GetFullChannelRequest
-from telethon.tl.types import InputChannel,  MessageMediaDocument, DocumentAttributeFilename, MessageMediaPhoto
-from telethon.errors import SessionPasswordNeededError
 import sys
 import os
 from pathlib import Path
-from tqdm import tqdm
+try:
+    from telethon.sync import TelegramClient
+    from telethon.tl.functions.contacts import ResolveUsernameRequest
+    from telethon.tl.functions.channels import GetFullChannelRequest
+    from telethon.tl.types import InputChannel,  MessageMediaDocument, DocumentAttributeFilename, MessageMediaPhoto
+    from telethon.errors import SessionPasswordNeededError
+    from tqdm import tqdm
+except:
+    print("Installing dependencies...")
+    import subprocess
+    resultado = subprocess.run(["pip", "install", "tqdm", "telethon"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    from telethon.sync import TelegramClient
+    from telethon.tl.functions.contacts import ResolveUsernameRequest
+    from telethon.tl.functions.channels import GetFullChannelRequest
+    from telethon.tl.types import InputChannel,  MessageMediaDocument, DocumentAttributeFilename, MessageMediaPhoto
+    from telethon.errors import SessionPasswordNeededError
+    from tqdm import tqdm
+
 
 api_id = 21518307
 api_hash = '0c3d16f2b71e5be100746c6b78828963'
