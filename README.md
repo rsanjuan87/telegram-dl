@@ -6,6 +6,9 @@
 `git clone https://github.com/rsanjuan87/telegram-dl && cd telegram-dl && ./install.sh`
 
 ## Usage
+ `telegram-dl <url> [output dir]`
+ 
+ example: 
 `telegram-dl https://t.me/chat_id/874 ~/` 
 
 ## Simple usage
