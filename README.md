@@ -18,9 +18,9 @@ Telegram Media Downloader
       -o, --on-collision-overwrite      Overwrite existing files
       -r, --on-collision-rename         Rename existing files
       -c, --on-collision-cancel         Cancel existing files
-    print('\n progress options')
+     progress options
       -l, --progress-log                Show progress as log
       -b, --progress-bar                Show progress as bar
-    print('\n basic options')
+     basic options
       -q, --quiet                       Quiet mode
       -h, --help                        Show this help
