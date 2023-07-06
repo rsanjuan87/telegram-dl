@@ -46,7 +46,7 @@ def show_help():
 
 options =[]
 for e in sys.argv:
-    if e == 'main.py' or e == app_name:
+    if e.endswith('main.py') or e.endswith(app_name):
         continue
     if e == '--help' or e == '-h':
         show_help()
@@ -68,7 +68,7 @@ for e in options:
         phone_number = e.replace('-n=', '')
 
 
-print(options)
+# print(options)
 
 
 if url == '':
@@ -94,9 +94,10 @@ if phone_number == '':
             sys.exit(0)
         phone_number = files[int(i)-1].removesuffix('.session')
 
-print(phone_number)
-print(url)
-exit
+# print(phone_number)
+# print(url)
+# print(output_dir)
+# exit
     
 channel = url.split('/')[3]
 message_id = int(url.split('/')[4])
@@ -127,13 +128,15 @@ entity = client.get_entity(channel)
 #                     filename = attribute.file_name
 #                     print('Filename:', filename)
 #         message.download_media(filename)
-
+total_bytes = 0
 message = client.get_messages(channel, ids=message_id)
 if message.media:
     filename = '{}_'.format(message.id)
     if(isinstance(message.media, MessageMediaPhoto)):
         filename += '{}.jpg'.format(message.media.photo.id)
+        print(message)
     if isinstance(message.media, MessageMediaDocument):
+        total_bytes = message.media.document.size
         for attribute in message.media.document.attributes:
             if isinstance(attribute, DocumentAttributeFilename):
                 filename = attribute.file_name
@@ -172,7 +175,7 @@ if message.media:
     if '--progress-log'in options or '-l'in options:
         client.download_media(message.media, output_file, progress_callback = progress_callback)
     elif not '--quiet'in options and not '-q'in options:
-        with tqdm(total=message.media.document.size, unit='B', unit_scale=True, ncols=100, bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt}') as bar:
+        with tqdm(total=total_bytes, unit='B', unit_scale=True, ncols=100, bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt}') as bar:
             client.download_media(message.media, output_file, progress_callback = progress_callback)
 
     
