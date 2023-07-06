@@ -2,17 +2,17 @@
 ### Download media from Telegram
 
 
-## installation
+## Install
 `git clone https://github.com/rsanjuan87/telegram-dl && cd telegram-dl && ./install.sh`
 
-## usage
+## Usage
 `telegram-dl https://t.me/chat_id/874 ~/` 
 
-## simple usage
+## Simple usage
 `telegram-dl https://t.me/chat_id/874`
 
 
-## params
+## Params
     session options
     -n, --phone-number=<phone number> Session phone number to use
 
@@ -29,8 +29,11 @@
     -q, --quiet                       Quiet mode
     -h, --help                        Show this help
 
-
-
-
-## uninstallation
+## Uninstall
 `git clone https://github.com/rsanjuan87/telegram-dl && cd telegram-dl && ./uninstall.sh && cd .. && rm -rf telegram-dl`
+
+# Donate
+https://paypal.me/rsanjuan87
+
+<img src="https://github.com/rsanjuan87/telegram-dl/assets/25087943/9f283943-cc16-489c-81fd-44eacb2a673b" height="200"/>
+
